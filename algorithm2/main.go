@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"strings"
 )
 
 const (
@@ -25,27 +24,51 @@ type result struct {
 	CountSolotions int
 }
 
-func main() {
-	directions = []int{-1, 0, 1, 2}
-	var wall string
-	var Wall1x, wall1y, wall2x, wall2y int
-	fmt.Println("Enter first wall position in x,y format")
-	fmt.Scanln(&wall)
-	pos := strings.Split(wall, ",")
-	Wall1x, _ = strconv.Atoi(pos[0])
-	wall1y, _ = strconv.Atoi(pos[1])
-	fmt.Println("Enter second wall position in x,y format")
-	fmt.Scanln(&wall)
-	pos = strings.Split(wall, ",")
-	wall2x, _ = strconv.Atoi(pos[0])
-	wall2y, _ = strconv.Atoi(pos[1])
-	board := createMap(Wall1x, wall1y, wall2x, wall2y)
-	printMap(board)
+func init() {
+	directions = []int{-1, 0, 1}
 }
 
-func solve() {}
+func main() {
+	board := createMap()
+	printMap(board)
+	res := &result{}
+	isSolotion(board, 0, 0, res)
+}
 
-func isSafe(board [][]int, row, col int) bool {
+func isSolotion(board [][]int, startingI, startingJ int, res *result) bool {
+	//	fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+	//printMap(board)
+	//fmt.Println("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+	//time.Sleep(time.Duration(2) * time.Second)
+	//fmt.Println(res.CountQuens)
+	if res.CountQuens >= MapSize { // count of queens for this problem has been reached to max
+		return true
+	}
+	for i := startingI; i < MapSize; i++ {
+		for j := 0; j < MapSize; j++ {
+			//fmt.Println("tss")
+			if i == startingI && j < startingJ {
+				continue // to avoid visiting visited nodes
+			}
+			if canPut(board, i, j) {
+				//fmt.Println("tss")
+				board[i][j] = int(Queen)
+				res.CountQuens += 1
+				if isSolotion(board, i, j+1, res) {
+					fmt.Println("Solotion number " + strconv.Itoa(res.CountSolotions) + ":")
+					res.CountSolotions += 1
+					printMap(board)
+					fmt.Println("##########################################################")
+				}
+				board[i][j] = int(Empty)
+				res.CountQuens -= 1
+			}
+		}
+	}
+	return false
+}
+
+func canPut(board [][]int, row, col int) bool {
 	for _, rowDirection := range directions {
 		for _, colDirection := range directions {
 			nextRow := row + rowDirection
@@ -73,13 +96,27 @@ func isSafe(board [][]int, row, col int) bool {
 	return true
 }
 
-func createMap(wall1x, wall1y, wall2x, wall2y int) [][]int {
+func createMap() [][]int {
+	/*var wall string
+	var wall1x, wall1y, wall2x, wall2y int
+	fmt.Println("Enter first wall position in x,y format")
+	fmt.Scanln(&wall)
+	pos := strings.Split(wall, ",")
+	wall1x, _ = strconv.Atoi(pos[0])
+	wall1y, _ = strconv.Atoi(pos[1])
+	fmt.Println("Enter second wall position in x,y format")
+	fmt.Scanln(&wall)
+	pos = strings.Split(wall, ",")
+	wall2x, _ = strconv.Atoi(pos[0])
+	wall2y, _ = strconv.Atoi(pos[1])*/
 	boardMap := make([][]int, MapSize)
 	for i := range boardMap {
 		boardMap[i] = make([]int, MapSize)
 	}
-	boardMap[wall1x][wall1y] = int(Wall)
-	boardMap[wall2x][wall2y] = int(Wall)
+	//boardMap[wall1x][wall1y] = int(Wall)
+	//boardMap[wall2x][wall2y] = int(Wall)
+	boardMap[0][int(MapSize/2)] = int(Wall)
+	boardMap[int(MapSize/2)][int(MapSize/2)] = int(Wall)
 	return boardMap
 }
 
