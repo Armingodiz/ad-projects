@@ -69,16 +69,6 @@ func (b Box) isLighter(d Box) bool {
 	return b.Weigth < d.Weigth
 }
 
-func getCopy(boxes []Box) []Box {
-	cp := make([]Box, 0)
-	for _, box := range boxes {
-		b := NewBox(box.Weigth)
-		b.Sides = box.Sides
-		cp = append(cp, b)
-	}
-	return cp
-}
-
 func sortBoxes(boxes []Box) []Box {
 	var n = len(boxes)
 	for i := 0; i < n; i++ {
@@ -106,10 +96,11 @@ func reverse(boxes []Box) []Box {
 	return boxes
 }
 func printTower(boxes []Box) {
+	boxes = reverse(boxes)
 	for _, box := range boxes {
-		printSide(Color(box.Sides[0]))
-		fmt.Println(box.Weigth)
 		printSide(Color(box.Sides[5]))
+		fmt.Println(box.Weigth)
+		printSide(Color(box.Sides[0]))
 	}
 }
 func printSide(c Color) {
