@@ -34,23 +34,31 @@ func main() {
 	board := createMap()
 	printMap(board)
 	res := &result{}
-	isSolotion(board, 0, 0, res)
+	var s int
+	fmt.Println("enter the min score:")
+	fmt.Scanln(&s)
+	isSolotionNew(board, MapSize-1, MapSize-1, res, 0, s)
 }
 
-func isSolotion(board [][]int, startingI, startingJ int, res *result) bool {
+func isSolotionNew(board [][]int, startingI, startingJ int, res *result, currentScore, minScore int) bool {
 	if res.CountQuens >= MapSize { // count of queens for this problem has been reached to max
 		return true
 	}
-	for i := startingI; i < MapSize; i++ {
-		for j := 0; j < MapSize; j++ {
-			if i == startingI && j < startingJ {
+	for i := startingI; i >= 0; i-- {
+		for j := MapSize - 1; j >= 0; j-- {
+			maxPossible := currentScore + calculateMaxScore(board, i*MapSize+j, MapSize-res.CountQuens)
+			if maxPossible < minScore {
+				return false
+			}
+			if i == startingI && j > startingJ {
 				continue // to avoid visiting visited nodes
 			}
 			if canPut(board, i, j) {
+				newScore := currentScore + calculateScore(board, i*MapSize+j)
 				board[i][j] = int(Queen)
 				res.CountQuens += 1
-				if isSolotion(board, i, j+1, res) {
-					fmt.Println("Solotion number " + strconv.Itoa(res.CountSolotions) + ":")
+				if isSolotionNew(board, i, j+1, res, newScore, minScore) {
+					fmt.Println("Solotion number " + strconv.Itoa(res.CountSolotions) + ", with score " + strconv.Itoa(newScore) + ":")
 					res.CountSolotions += 1
 					printMap(board)
 					fmt.Println("##########################################################")
@@ -61,6 +69,29 @@ func isSolotion(board [][]int, startingI, startingJ int, res *result) bool {
 		}
 	}
 	return false
+}
+
+func calculateScore(board [][]int, index int) int {
+	if index >= MapSize*MapSize {
+		return 0
+	}
+	if board[int(index/MapSize)][index%MapSize] != 0 {
+		return 0
+	}
+	return index + 1
+}
+func calculateMaxScore(board [][]int, index, queens int) int {
+	var placed, score int
+	currentIndex := index
+	for queens > placed && currentIndex < MapSize*MapSize && currentIndex >= 0 {
+		tmp := calculateScore(board, currentIndex)
+		if tmp > 0 {
+			score += tmp
+			placed += 1
+		}
+		currentIndex -= 1
+	}
+	return score
 }
 
 func canPut(board [][]int, row, col int) bool {
