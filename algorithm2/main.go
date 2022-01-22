@@ -6,11 +6,8 @@ import (
 	"strings"
 )
 
-const (
-	MapSize = 8
-)
-
 var directions []int
+var MapSize int
 
 type Node int
 
@@ -27,6 +24,10 @@ type result struct {
 
 func init() {
 	directions = []int{-1, 0, 1}
+	var s int
+	fmt.Println("enter the map size:")
+	fmt.Scanln(&s)
+	MapSize = s
 }
 
 func main() {
